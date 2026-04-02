@@ -1,0 +1,60 @@
+{
+  "categoryTree": {
+    "论文": {
+      "机器学习": {
+        "监督学习": true,
+        "无监督学习": true,
+        "强化学习": true,
+        "迁移学习": true,
+        "联邦学习": true
+      },
+      "深度学习": {
+        "CNN": true,
+        "RNN": true,
+        "Transformer": true,
+        "GAN": true,
+        "Diffusion Model": true
+      },
+      "计算机视觉": {
+        "目标检测": true,
+        "图像分割": true,
+        "图像生成": true,
+        "视频分析": true,
+        "三维视觉": true
+      },
+      "自然语言处理": {
+        "文本分类": true,
+        "命名实体识别": true,
+        "机器翻译": true,
+        "问答系统": true,
+        "文本生成": true,
+        "大语言模型": true
+      },
+      "推荐系统": true,
+      "知识图谱": true,
+      "图神经网络": true
+    },
+    "领域": {
+      "医疗健康": {
+        "医学影像": true,
+        "疾病诊断": true,
+        "药物发现": true
+      },
+      "金融科技": {
+        "风控": true,
+        "量化交易": true,
+        "信用评分": true
+      },
+      "自动驾驶": true,
+      "机器人": true,
+      "物联网": true
+    },
+    "方法": {
+      "优化算法": true,
+      "模型压缩": true,
+      "数据增强": true,
+      "注意力机制": true
+    },
+    "Other": true
+  }
+}

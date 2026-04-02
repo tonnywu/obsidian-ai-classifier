@@ -1,0 +1,61 @@
+{
+  "aiProvider": "deepseek",
+  "ollamaUrl": "http://localhost:11434",
+  "ollamaModel": "llama3.2",
+  "openaiApiKey": "sk-82777177f81c4d36b668a3d89e03e0cd",
+  "openaiModel": "gpt-4o-mini",
+  "openaiApiUrl": "https://api.openai.com/v1",
+  "deepseekApiKey": "sk-82777177f81c4d36b668a3d89e03e0cd",
+  "deepseekModel": "deepseek-chat",
+  "deepseekApiUrl": "https://api.deepseek.com/v1",
+  "moonshotApiKey": "",
+  "moonshotModel": "moonshot-v1-8k",
+  "moonshotApiUrl": "https://api.moonshot.cn/v1",
+  "zhipuApiKey": "",
+  "zhipuModel": "glm-4",
+  "zhipuApiUrl": "https://open.bigmodel.cn/api/paas/v4",
+  "inboxFolder": "TestInbox",
+  "categoryTree": {
+    "Programming": {
+      "Frontend": true,
+      "Backend": true,
+      "Mobile": true,
+      "DevOps": true
+    },
+    "AI & ML": {
+      "Machine Learning": true,
+      "Deep Learning": true,
+      "NLP": true
+    },
+    "Data": {
+      "Database": true,
+      "Data Engineering": true,
+      "Analytics": true
+    },
+    "Architecture": {
+      "System Design": true,
+      "Microservices": true
+    },
+    "Other": true
+  },
+  "categories": [
+    "Programming/Frontend",
+    "Programming/Backend",
+    "Programming/Mobile",
+    "Programming/DevOps",
+    "AI & ML/Machine Learning",
+    "AI & ML/Deep Learning",
+    "AI & ML/NLP",
+    "Data/Database",
+    "Data/Data Engineering",
+    "Data/Analytics",
+    "Architecture/System Design",
+    "Architecture/Microservices",
+    "Other"
+  ],
+  "scanSubfolders": false,
+  "enableSuggestedCategories": true,
+  "autoMoveFile": true,
+  "confidenceThreshold": 0.7,
+  "enableDebugLog": false
+}

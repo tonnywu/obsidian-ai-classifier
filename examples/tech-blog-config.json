@@ -1,0 +1,79 @@
+{
+  "categoryTree": {
+    "编程": {
+      "前端": {
+        "React": true,
+        "Vue": true,
+        "Angular": true,
+        "CSS": true,
+        "JavaScript": true,
+        "TypeScript": true
+      },
+      "后端": {
+        "Node.js": true,
+        "Python": true,
+        "Java": true,
+        "Go": true,
+        "Rust": true
+      },
+      "移动端": {
+        "iOS": true,
+        "Android": true,
+        "Flutter": true,
+        "React Native": true
+      },
+      "DevOps": {
+        "Docker": true,
+        "Kubernetes": true,
+        "CI/CD": true,
+        "云服务": true
+      }
+    },
+    "AI & ML": {
+      "机器学习": true,
+      "深度学习": {
+        "PyTorch": true,
+        "TensorFlow": true,
+        "CNN": true,
+        "RNN": true
+      },
+      "NLP": {
+        "LLM": true,
+        "ChatGPT": true,
+        "Prompt Engineering": true
+      },
+      "计算机视觉": true,
+      "强化学习": true
+    },
+    "数据": {
+      "数据库": {
+        "SQL": true,
+        "PostgreSQL": true,
+        "MySQL": true,
+        "MongoDB": true,
+        "Redis": true
+      },
+      "数据工程": {
+        "ETL": true,
+        "数据仓库": true,
+        "Spark": true
+      },
+      "数据分析": {
+        "可视化": true,
+        "统计": true
+      }
+    },
+    "架构": {
+      "系统设计": true,
+      "微服务": true,
+      "分布式系统": true,
+      "设计模式": true
+    },
+    "工具": {
+      "IDE": true,
+      "Git": true,
+      "效率工具": true
+    },
+    "Other": true
+  }
+}

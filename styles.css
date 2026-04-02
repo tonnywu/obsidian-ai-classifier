@@ -1,0 +1,120 @@
+.category-tree-input {
+	width: 100%;
+	font-family: monospace;
+}
+
+/* CategoryTreeView 样式 */
+.category-tree-container {
+	margin-top: 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	padding: 10px;
+	background: var(--background-secondary);
+}
+
+.category-tree-wrapper {
+	margin-top: 10px;
+}
+
+.category-tree-actions {
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.category-tree-actions button.mod-cta {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.category-node {
+	margin: 5px 0;
+}
+
+.category-node-row {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	transition: background 0.2s;
+}
+
+.category-node-row:hover {
+	background: var(--background-modifier-hover);
+}
+
+.category-expand-btn {
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	font-size: 10px;
+	color: var(--text-muted);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.category-expand-btn:hover {
+	color: var(--text-normal);
+}
+
+.category-expand-placeholder {
+	width: 20px;
+	display: inline-block;
+}
+
+.category-icon {
+	font-size: 14px;
+}
+
+.category-name {
+	flex: 1;
+	font-size: 14px;
+	color: var(--text-normal);
+}
+
+.category-node-actions {
+	display: flex;
+	gap: 4px;
+	opacity: 0;
+	transition: opacity 0.2s;
+}
+
+.category-node-row:hover .category-node-actions {
+	opacity: 1;
+}
+
+.category-action-btn {
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	cursor: pointer;
+	font-size: 12px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.category-action-btn:hover {
+	background: var(--background-modifier-hover);
+	border-color: var(--interactive-accent);
+}
+
+.category-children {
+	margin-left: 25px;
+	padding-left: 10px;
+	border-left: 1px dashed var(--background-modifier-border);
+}
+
+.category-tree-footer {
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid var(--background-modifier-border);
+}
