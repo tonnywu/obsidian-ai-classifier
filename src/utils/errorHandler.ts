@@ -2,6 +2,7 @@
  * 错误处理工具
  * 提供统一的错误类型和处理方法
  */
+import { requestUrl, RequestUrlParam, Response } from 'obsidian';
 
 /**
  * 自定义错误类型
@@ -87,9 +88,9 @@ export async function withRetry<T>(
 /**
  * 判断是否为可重试错误
  */
-function isRetryableError(error: any): boolean {
-	const message = error?.message?.toLowerCase() || '';
-	const status = error?.status || error?.response?.status;
+function isRetryableError(error: unknown): boolean {
+	const message = (error as { message?: string })?.message?.toLowerCase() || '';
+	const status = (error as { status?: number })?.status || (error as { response?: { status?: number } })?.response?.status;
 	
 	// 网络错误
 	if (message.includes('network') || message.includes('fetch') || message.includes('enotfound')) {
@@ -112,9 +113,9 @@ function isRetryableError(error: any): boolean {
 /**
  * 判断是否为认证错误
  */
-function isAuthError(error: any): boolean {
-	const status = error?.status || error?.response?.status;
-	const message = error?.message?.toLowerCase() || '';
+function isAuthError(error: unknown): boolean {
+	const status = (error as { status?: number })?.status || (error as { response?: { status?: number } })?.response?.status;
+	const message = (error as { message?: string })?.message?.toLowerCase() || '';
 	
 	return status === 401 || status === 403 || 
 		message.includes('unauthorized') || message.includes('invalid api key');
@@ -123,9 +124,9 @@ function isAuthError(error: any): boolean {
 /**
  * 判断是否为限流错误
  */
-function isRateLimitError(error: any): boolean {
-	const status = error?.status || error?.response?.status;
-	const message = error?.message?.toLowerCase() || '';
+function isRateLimitError(error: unknown): boolean {
+	const status = (error as { status?: number })?.status || (error as { response?: { status?: number } })?.response?.status;
+	const message = (error as { message?: string })?.message?.toLowerCase() || '';
 	
 	return status === 429 || message.includes('rate limit') || message.includes('too many requests');
 }
@@ -133,9 +134,9 @@ function isRateLimitError(error: any): boolean {
 /**
  * 从错误中获取限流等待时间
  */
-function getRateLimitWaitTime(error: any): number | null {
+function getRateLimitWaitTime(error: unknown): number | null {
 	// 尝试从响应头获取
-	const retryAfter = error?.response?.headers?.get('retry-after');
+	const retryAfter = (error as { response?: { headers?: { get: (key: string) => string | null } } })?.response?.headers?.get('retry-after');
 	if (retryAfter) {
 		const seconds = parseInt(retryAfter, 10);
 		if (!isNaN(seconds)) {
@@ -165,7 +166,7 @@ function sleep(ms: number): Promise<void> {
 /**
  * 分类错误类型
  */
-function classifyError(error: any): AIClassifierError {
+function classifyError(error: unknown): AIClassifierError {
 	if (error instanceof AIClassifierError) {
 		return error;
 	}
@@ -285,32 +286,48 @@ export function validateApiKey(apiKey: string, providerName: string): void {
 }
 
 /**
- * 带超时的 fetch
+ * 带超时的 fetch（使用 Obsidian 的 requestUrl）
  */
 export async function fetchWithTimeout(
 	url: string,
 	options: RequestInit = {},
 	timeout = 30000
 ): Promise<Response> {
-	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), timeout);
-	
 	try {
-		const response = await fetch(url, {
-			...options,
-			signal: controller.signal,
+		const requestParams: RequestUrlParam = {
+			url,
+			method: options.method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' || 'GET',
+			headers: options.headers as Record<string, string> || {},
+			body: options.body as string || undefined,
+		};
+		
+		const response = await requestUrl({
+			...requestParams,
+			throw: false, // 不自动抛出 HTTP 错误
 		});
-		return response;
-	} catch (error: any) {
-		if (error.name === 'AbortError') {
-			throw new AIClassifierError(
-				'请求超时',
-				'timeout',
-				error
-			);
-		}
-		throw error;
-	} finally {
-		clearTimeout(timeoutId);
+		
+		return {
+			ok: response.status >= 200 && response.status < 300,
+			status: response.status,
+			statusText: response.text || '',
+			headers: new Headers(response.headers),
+			json: async () => response.json,
+			text: async () => response.text,
+			blob: async () => new Blob([response.arrayBuffer]),
+			arrayBuffer: async () => response.arrayBuffer,
+			formData: async () => { throw new Error('formData not supported'); },
+			clone: function() { return this as Response; },
+			body: null,
+			bodyUsed: false,
+			redirected: false,
+			type: 'basic' as ResponseType,
+			url: url,
+		} as Response;
+	} catch (error: unknown) {
+		throw new AIClassifierError(
+			'请求超时或网络错误',
+			'timeout',
+			error
+		);
 	}
 }

@@ -1,4 +1,4 @@
-import { Plugin, PluginSettingTab, Setting, Notice, TFile } from 'obsidian';
+import { Plugin, TFile } from 'obsidian';
 import { DEFAULT_SETTINGS, PluginSettings, AIProvider } from './settings/types';
 import { SettingsTab } from './settings/SettingsTab';
 import { ClassifyCommand } from './commands/ClassifyCommand';
@@ -158,8 +158,7 @@ export default class AIClassifierPlugin extends Plugin {
 				}, this.logger);
 			
 			default: {
-				const exhaustiveCheck: never = providerType;
-				throw new Error(`未知的 AI Provider: ${exhaustiveCheck}`);
+				throw new Error(`未知的 AI Provider: ${providerType as string}`);
 			}
 		}
 	}

@@ -65,9 +65,9 @@ export const translations = {
 
 export function t(key: string): string {
 	const keys = key.split('.');
-	let result: any = translations;
+	let result: unknown = translations;
 	for (const k of keys) {
-		result = result?.[k];
+		result = (result as Record<string, unknown>)?.[k];
 	}
-	return result || key;
+	return (result as string) || key;
 }

@@ -26,10 +26,11 @@ export const fileOps = {
 				if (!await adapter.exists(newFolderPath)) {
 					await vault.createFolder(newFolderPath);
 				}
-			} catch (folderError: any) {
+			} catch (folderError: unknown) {
 				// 如果文件夹已存在，忽略错误
-				if (!folderError.message?.includes('already exists')) {
-					throw new Error(`创建文件夹失败: ${folderError.message}`);
+				const errorMsg = (folderError as { message?: string })?.message || '';
+				if (!errorMsg.includes('already exists')) {
+					throw new Error(`创建文件夹失败: ${errorMsg}`);
 				}
 			}
 			
@@ -63,9 +64,9 @@ export const fileOps = {
 			await vault.rename(file, newPath);
 			
 			// 返回新的文件引用
-			const newFile = vault.getAbstractFileByPath(newPath) as TFile;
+			const newFile = vault.getAbstractFileByPath(newPath);
 			
-			if (!newFile) {
+			if (!(newFile instanceof TFile)) {
 				throw new Error('移动后无法找到文件');
 			}
 			

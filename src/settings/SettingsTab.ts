@@ -249,7 +249,7 @@ export class SettingsTab extends PluginSettingTab {
 						if (confirm(t('settings.confirmRestoreDefault'))) {
 							this.plugin.settings.categoryTree = DEFAULT_SETTINGS.categoryTree;
 							this.plugin.settings.categories = this.flattenCategories(DEFAULT_SETTINGS.categoryTree);
-							this.plugin.saveSettings();
+							void this.plugin.saveSettings();
 							this.display(); // 刷新设置面板
 						}
 					});

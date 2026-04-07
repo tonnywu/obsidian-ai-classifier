@@ -1,5 +1,5 @@
 import { t } from './i18n';
-import { App, Modal, Setting, Notice } from 'obsidian';
+import { App, Modal } from 'obsidian';
 
 // 声明全局 app 变量
 declare const app: App;
