@@ -1,6 +1,6 @@
-import { App, PluginSettingTab, Setting, Notice, TextComponent } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import type AIClassifierPlugin from '../main';
-import { PluginSettings, AIProviderType, DEFAULT_SETTINGS } from './types';
+import { AIProviderType, DEFAULT_SETTINGS } from './types';
 import { t } from './i18n';
 import { CategoryTreeView } from './CategoryTreeView';
 
@@ -101,9 +101,9 @@ export class SettingsTab extends PluginSettingTab {
 					.addOption('moonshot', 'Moonshot (Kimi)')
 					.addOption('zhipu', 'Zhipu (智谱 AI)')
 					.setValue(this.plugin.settings.aiProvider)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.aiProvider = value as AIProviderType;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 						this.display();
 					});
 			});
@@ -115,9 +115,9 @@ export class SettingsTab extends PluginSettingTab {
 				.setDesc(t('settings.ollamaUrlDesc'))
 				.addText(text => {
 					text.setValue(this.plugin.settings.ollamaUrl)
-						.onChange(async (value) => {
+						.onChange((value) => {
 							this.plugin.settings.ollamaUrl = value;
-							await this.plugin.saveSettings();
+							this.plugin.saveSettings();
 						});
 				});
 			
@@ -126,9 +126,9 @@ export class SettingsTab extends PluginSettingTab {
 				.setDesc(t('settings.ollamaModelDesc'))
 				.addText(text => {
 					text.setValue(this.plugin.settings.ollamaModel)
-						.onChange(async (value) => {
+						.onChange((value) => {
 							this.plugin.settings.ollamaModel = value;
-							await this.plugin.saveSettings();
+							this.plugin.saveSettings();
 						});
 				});
 		} else {
@@ -139,9 +139,9 @@ export class SettingsTab extends PluginSettingTab {
 				.addText(text => {
 					text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'apiKey'))
 						.setPlaceholder('sk-...')
-						.onChange(async (value) => {
+						.onChange((value) => {
 							this.updateProviderConfig(this.plugin.settings.aiProvider, 'apiKey', value);
-							await this.plugin.saveSettings();
+							this.plugin.saveSettings();
 						});
 					text.inputEl.type = 'password';
 				});
@@ -156,9 +156,9 @@ export class SettingsTab extends PluginSettingTab {
 						dropdown.addOption(model.value, model.label);
 					});
 					dropdown.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'model'))
-						.onChange(async (value) => {
+						.onChange((value) => {
 							this.updateProviderConfig(this.plugin.settings.aiProvider, 'model', value);
-							await this.plugin.saveSettings();
+							this.plugin.saveSettings();
 						});
 				});
 			
@@ -169,9 +169,9 @@ export class SettingsTab extends PluginSettingTab {
 				.addText(text => {
 					text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'baseUrl'))
 						.setPlaceholder('https://api.example.com/v1')
-						.onChange(async (value) => {
+						.onChange((value) => {
 							this.updateProviderConfig(this.plugin.settings.aiProvider, 'baseUrl', value);
-							await this.plugin.saveSettings();
+							this.plugin.saveSettings();
 						});
 				});
 		}
@@ -208,9 +208,9 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.inboxFolderDesc'))
 			.addText(text => {
 				text.setValue(this.plugin.settings.inboxFolder)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.inboxFolder = value;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 					});
 			});
 		
@@ -219,9 +219,9 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc('是否递归扫描收件箱子目录中的文件。关闭则只分类收件箱顶层的文件。')
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.scanSubfolders)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.scanSubfolders = value;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 					});
 			});
 		
@@ -230,13 +230,13 @@ export class SettingsTab extends PluginSettingTab {
 		
 		const treeContainer = containerEl.createDiv('category-tree-wrapper');
 		
-		const treeView = new CategoryTreeView(
+		new CategoryTreeView(
 			treeContainer,
 			this.plugin.settings.categoryTree,
-			async (newTree) => {
+			(newTree) => {
 				this.plugin.settings.categoryTree = newTree;
 				this.plugin.settings.categories = this.flattenCategories(newTree);
-				await this.plugin.saveSettings();
+				this.plugin.saveSettings();
 			}
 		);
 		
@@ -245,11 +245,11 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(actionsEl)
 			.addButton(btn => {
 				btn.setButtonText(t('settings.restoreDefault'))
-					.onClick(async () => {
+					.onClick(() => {
 						if (confirm(t('settings.confirmRestoreDefault'))) {
 							this.plugin.settings.categoryTree = DEFAULT_SETTINGS.categoryTree;
 							this.plugin.settings.categories = this.flattenCategories(DEFAULT_SETTINGS.categoryTree);
-							await this.plugin.saveSettings();
+							this.plugin.saveSettings();
 							this.display(); // 刷新设置面板
 						}
 					});
@@ -265,9 +265,9 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.enableSuggestedCategoriesDesc'))
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.enableSuggestedCategories)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.enableSuggestedCategories = value;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 					});
 			});
 		
@@ -276,9 +276,9 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.autoMoveFileDesc'))
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.autoMoveFile)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.autoMoveFile = value;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 					});
 			});
 		
@@ -287,11 +287,11 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.confidenceThresholdDesc'))
 			.addSlider(slider => {
 				slider.setValue(this.plugin.settings.confidenceThreshold * 100)
-					.setLimits(0, 100)
+					.setLimits(0, 100, 1)
 					.setDynamicTooltip()
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.confidenceThreshold = value / 100;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 					});
 			});
 	}
@@ -305,9 +305,9 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.enableDebugLogDesc'))
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.enableDebugLog)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.enableDebugLog = value;
-						await this.plugin.saveSettings();
+						this.plugin.saveSettings();
 					});
 			});
 	}
@@ -316,7 +316,7 @@ export class SettingsTab extends PluginSettingTab {
 		const result: string[] = [];
 		for (const [key, value] of Object.entries(tree)) {
 			const path = prefix ? `${prefix}/${key}` : key;
-			if (typeof value === 'object' && value !== true) {
+			if (typeof value === 'object' && value !== null) {
 				result.push(...this.flattenCategories(value, path));
 			} else {
 				result.push(path);

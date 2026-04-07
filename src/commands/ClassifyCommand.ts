@@ -171,7 +171,7 @@ export class ClassifyCommand {
 			const modal = new ConfirmModal(
 				this.plugin.app,
 				message,
-				async (confirmed) => {
+				(confirmed) => {
 					if (confirmed) {
 						resolve(true);
 					} else {
