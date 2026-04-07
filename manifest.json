@@ -1,23 +1,10 @@
 {
-	"id": "obsidian-ai-classifier",
-	"name": "AI智能分类",
-	"version": "0.1.0",
-	"minAppVersion": "1.5.0",
-	"description": "使用 AI 智能识别文章内容并自动分类到对应文件夹",
-	"author": "tonnywu",
-	"authorUrl": "https://github.com/tonnywu",
-	"fundingUrl": "",
-	"license": "MIT",
-	"isDesktopOnly": false,
-	"main": "main.js",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "npm run dev -- --minify"
-	},
-	"keywords": [
-		"ai",
-		"classifier",
-		"automation",
-		"productivity"
-	]
+  "id": "ai-classifier",
+  "name": "AI Classifier",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Automatically organize notes using AI. Supports Ollama (free, local) and OpenAI API.",
+  "author": "tonnywu",
+  "authorUrl": "https://github.com/tonnywu",
+  "isDesktopOnly": false
 }
