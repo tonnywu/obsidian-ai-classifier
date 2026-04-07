@@ -15,12 +15,12 @@ export class Logger {
 	
 	debug(message: string, ...args: any[]): void {
 		if (this.enabled) {
-			console.log(`${this.prefix} ${message}`, ...args);
+			console.debug(`${this.prefix} ${message}`, ...args);
 		}
 	}
 	
 	info(message: string, ...args: any[]): void {
-		console.log(`${this.prefix} ${message}`, ...args);
+		console.debug(`${this.prefix} ${message}`, ...args);
 	}
 	
 	warn(message: string, ...args: any[]): void {

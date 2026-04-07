@@ -1,5 +1,3 @@
-import { t } from './i18n';
-
 export type AIProviderType = 'ollama' | 'openai' | 'deepseek' | 'moonshot' | 'zhipu';
 
 export interface CategoryTree {

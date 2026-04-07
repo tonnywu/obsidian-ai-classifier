@@ -312,12 +312,12 @@ export class SettingsTab extends PluginSettingTab {
 			});
 	}
 	
-	private flattenCategories(tree: any, prefix = ''): string[] {
+	private flattenCategories(tree: Record<string, unknown>, prefix = ''): string[] {
 		const result: string[] = [];
 		for (const [key, value] of Object.entries(tree)) {
 			const path = prefix ? `${prefix}/${key}` : key;
 			if (typeof value === 'object' && value !== null) {
-				result.push(...this.flattenCategories(value, path));
+				result.push(...this.flattenCategories(value as Record<string, unknown>, path));
 			} else {
 				result.push(path);
 			}

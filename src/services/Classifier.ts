@@ -1,4 +1,4 @@
-import { TFile, Notice, TAbstractFile } from 'obsidian';
+import { TFile } from 'obsidian';
 import { AIProvider, ClassificationResult, PluginSettings } from '../settings/types';
 import { Logger } from '../utils/logger';
 import { ContentExtractor } from './ContentExtractor';

@@ -13,18 +13,25 @@ export interface CategoryNode {
 }
 
 /**
+ * 分类树节点类型
+ */
+interface CategoryTreeNode {
+	[key: string]: CategoryTreeNode | true;
+}
+
+/**
  * 分类树可视化组件
  */
 export class CategoryTreeView {
 	private containerEl: HTMLElement;
-	private tree: Record<string, any>;
-	private onChange: (tree: Record<string, any>) => void;
+	private tree: CategoryTreeNode;
+	private onChange: (tree: CategoryTreeNode) => void;
 	private expandedNodes: Set<string> = new Set();
 
 	constructor(
 		containerEl: HTMLElement,
-		tree: Record<string, any>,
-		onChange: (tree: Record<string, any>) => void
+		tree: CategoryTreeNode,
+		onChange: (tree: CategoryTreeNode) => void
 	) {
 		this.containerEl = containerEl;
 		this.tree = JSON.parse(JSON.stringify(tree)); // 深拷贝
@@ -59,7 +66,7 @@ export class CategoryTreeView {
 	 */
 	private renderTreeLevel(
 		container: HTMLElement,
-		node: Record<string, any>,
+		node: CategoryTreeNode,
 		path: string
 	): void {
 		for (const [key, value] of Object.entries(node)) {

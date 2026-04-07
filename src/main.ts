@@ -21,7 +21,7 @@ export default class AIClassifierPlugin extends Plugin {
 	private settingsTab: SettingsTab;
 	
 	async onload(): Promise<void> {
-		console.log('[AI Classifier] 插件加载中...');
+		console.debug('[AI Classifier] 插件加载中...');
 		
 		// 加载设置
 		await this.loadSettings();
@@ -58,7 +58,7 @@ export default class AIClassifierPlugin extends Plugin {
 				const file = this.app.workspace.getActiveFile();
 				if (file) {
 					if (!checking) {
-						this.commands.classifyCurrentFile();
+						void this.commands.classifyCurrentFile();
 					}
 					return true;
 				}
@@ -105,11 +105,11 @@ export default class AIClassifierPlugin extends Plugin {
 		this.settingsTab = new SettingsTab(this.app, this);
 		this.addSettingTab(this.settingsTab);
 		
-		console.log('[AI Classifier] 插件加载完成!');
+		console.debug('[AI Classifier] 插件加载完成!');
 	}
 	
 	onunload(): void {
-		console.log('[AI Classifier] 插件已卸载');
+		console.debug('[AI Classifier] 插件已卸载');
 	}
 	
 	/**
@@ -157,8 +157,10 @@ export default class AIClassifierPlugin extends Plugin {
 					baseUrl: this.settings.zhipuApiUrl,
 				}, this.logger);
 			
-			default:
-				throw new Error(`未知的 AI Provider: ${providerType}`);
+			default: {
+				const exhaustiveCheck: never = providerType;
+				throw new Error(`未知的 AI Provider: ${exhaustiveCheck}`);
+			}
 		}
 	}
 	
@@ -232,12 +234,12 @@ export default class AIClassifierPlugin extends Plugin {
 	/**
 	 * 将分类树展平为列表
 	 */
-	private flattenCategories(tree: any, prefix = ''): string[] {
+	private flattenCategories(tree: Record<string, unknown>, prefix = ''): string[] {
 		const result: string[] = [];
 		for (const [key, value] of Object.entries(tree)) {
 			const path = prefix ? `${prefix}/${key}` : key;
-			if (typeof value === 'object' && value !== true) {
-				result.push(...this.flattenCategories(value, path));
+			if (typeof value === 'object' && value !== null && value !== true) {
+				result.push(...this.flattenCategories(value as Record<string, unknown>, path));
 			} else {
 				result.push(path);
 			}

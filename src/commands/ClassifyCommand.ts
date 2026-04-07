@@ -1,4 +1,4 @@
-import { App, Notice, TFile, FolderSuggest, TextComponent, Modal } from 'obsidian';
+import { App, Notice, TFile, Modal } from 'obsidian';
 import type AIClassifierPlugin from '../main';
 import { ClassificationResult } from '../settings/types';
 import { t } from '../settings/i18n';
@@ -33,7 +33,7 @@ export class ClassifyCommand {
 		}
 		
 		// 查找收件箱文件夹
-		const inboxFiles = await this.findInboxFiles(inboxFolder);
+		const inboxFiles = this.findInboxFiles(inboxFolder);
 		
 		if (inboxFiles.length === 0) {
 			new Notice(t('classify.noFiles'));
@@ -186,7 +186,7 @@ export class ClassifyCommand {
 	/**
 	 * 查找收件箱中的所有笔记文件
 	 */
-	private async findInboxFiles(inboxFolder: string): Promise<TFile[]> {
+	private findInboxFiles(inboxFolder: string): TFile[] {
 		const files = this.plugin.app.vault.getFiles();
 		const scanSubfolders = this.plugin.settings.scanSubfolders;
 		
