@@ -118,3 +118,43 @@
 	padding-top: 15px;
 	border-top: 1px solid var(--background-modifier-border);
 }
+
+/* Settings tab styles */
+.settings-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.settings-back-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-muted);
+}
+
+.settings-back-btn:hover {
+	color: var(--text-normal);
+}
+
+.settings-title {
+	margin: 0;
+	flex: 1;
+}
+
+.modal-button-container {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+/* Modal input styles */
+.modal-input {
+	width: 100%;
+	margin-bottom: 20px;
+}

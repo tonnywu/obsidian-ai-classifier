@@ -51,9 +51,9 @@ export const fileOps = {
 				const uniqueNewPath = `${newFolderPath}/${baseName}_${timestamp}.${ext}`;
 				
 				await vault.rename(file, uniqueNewPath);
-				const newFile = vault.getAbstractFileByPath(uniqueNewPath) as TFile;
+				const newFile = vault.getAbstractFileByPath(uniqueNewPath);
 				
-				if (!newFile) {
+				if (!(newFile instanceof TFile)) {
 					throw new Error('移动后无法找到文件');
 				}
 				

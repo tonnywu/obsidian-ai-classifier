@@ -2,7 +2,7 @@
  * 错误处理工具
  * 提供统一的错误类型和处理方法
  */
-import { requestUrl, RequestUrlParam, Response } from 'obsidian';
+import { requestUrl, RequestUrlParam } from 'obsidian';
 
 /**
  * 自定义错误类型
@@ -90,7 +90,8 @@ export async function withRetry<T>(
  */
 function isRetryableError(error: unknown): boolean {
 	const message = (error as { message?: string })?.message?.toLowerCase() || '';
-	const status = (error as { status?: number })?.status || (error as { response?: { status?: number } })?.response?.status;
+	const status = (error as { status?: number })?.status || 
+		(error as { response?: { status?: number } })?.response?.status;
 	
 	// 网络错误
 	if (message.includes('network') || message.includes('fetch') || message.includes('enotfound')) {
@@ -98,7 +99,7 @@ function isRetryableError(error: unknown): boolean {
 	}
 	
 	// 服务器错误 (5xx)
-	if (status >= 500 && status < 600) {
+	if (status !== undefined && status >= 500 && status < 600) {
 		return true;
 	}
 	
@@ -171,9 +172,10 @@ function classifyError(error: unknown): AIClassifierError {
 		return error;
 	}
 	
-	const message = error?.message || String(error);
+	const errorObj = error as { message?: string; status?: number; response?: { status?: number } };
+	const message = errorObj?.message || String(error);
 	const lowerMessage = message.toLowerCase();
-	const status = error?.status || error?.response?.status;
+	const status = errorObj?.status || errorObj?.response?.status;
 	
 	// 网络错误
 	if (lowerMessage.includes('network') || lowerMessage.includes('fetch') || 
@@ -181,7 +183,7 @@ function classifyError(error: unknown): AIClassifierError {
 		return new AIClassifierError(
 			'网络连接失败，请检查网络设置',
 			'network',
-			error
+			error instanceof Error ? error : undefined
 		);
 	}
 	
@@ -190,7 +192,7 @@ function classifyError(error: unknown): AIClassifierError {
 		return new AIClassifierError(
 			'请求超时，请稍后重试',
 			'timeout',
-			error
+			error instanceof Error ? error : undefined
 		);
 	}
 	
@@ -200,7 +202,7 @@ function classifyError(error: unknown): AIClassifierError {
 		return new AIClassifierError(
 			'API Key 无效或未授权',
 			'auth',
-			error
+			error instanceof Error ? error : undefined
 		);
 	}
 	
@@ -209,7 +211,7 @@ function classifyError(error: unknown): AIClassifierError {
 		return new AIClassifierError(
 			'API 请求过于频繁，请稍后重试',
 			'rate_limit',
-			error
+			error instanceof Error ? error : undefined
 		);
 	}
 	
@@ -218,7 +220,7 @@ function classifyError(error: unknown): AIClassifierError {
 		return new AIClassifierError(
 			'响应数据格式错误',
 			'parse',
-			error
+			error instanceof Error ? error : undefined
 		);
 	}
 	
@@ -226,7 +228,7 @@ function classifyError(error: unknown): AIClassifierError {
 	return new AIClassifierError(
 		message,
 		'unknown',
-		error
+		error instanceof Error ? error : undefined
 	);
 }
 
@@ -291,7 +293,7 @@ export function validateApiKey(apiKey: string, providerName: string): void {
 export async function fetchWithTimeout(
 	url: string,
 	options: RequestInit = {},
-	timeout = 30000
+	_timeout = 30000
 ): Promise<Response> {
 	try {
 		const requestParams: RequestUrlParam = {
@@ -311,11 +313,11 @@ export async function fetchWithTimeout(
 			status: response.status,
 			statusText: response.text || '',
 			headers: new Headers(response.headers),
-			json: async () => response.json,
-			text: async () => response.text,
-			blob: async () => new Blob([response.arrayBuffer]),
-			arrayBuffer: async () => response.arrayBuffer,
-			formData: async () => { throw new Error('formData not supported'); },
+			json: () => Promise.resolve(response.json),
+			text: () => Promise.resolve(response.text),
+			blob: () => Promise.resolve(new Blob([response.arrayBuffer])),
+			arrayBuffer: () => Promise.resolve(response.arrayBuffer),
+			formData: () => Promise.reject(new Error('formData not supported')),
 			clone: function() { return this as Response; },
 			body: null,
 			bodyUsed: false,
@@ -327,7 +329,7 @@ export async function fetchWithTimeout(
 		throw new AIClassifierError(
 			'请求超时或网络错误',
 			'timeout',
-			error
+			error instanceof Error ? error : undefined
 		);
 	}
 }

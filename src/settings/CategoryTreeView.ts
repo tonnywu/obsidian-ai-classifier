@@ -1,5 +1,5 @@
 import { t } from './i18n';
-import { App, Modal } from 'obsidian';
+import { App, Modal, Notice } from 'obsidian';
 
 // 声明全局 app 变量
 declare const app: App;
@@ -15,8 +15,8 @@ export interface CategoryNode {
 /**
  * 分类树节点类型
  */
-interface CategoryTreeNode {
-	[key: string]: CategoryTreeNode | true;
+export interface CategoryTreeNode {
+	[key: string]: CategoryTreeNode | true | boolean;
 }
 
 /**
@@ -242,15 +242,16 @@ export class CategoryTreeView {
 	/**
 	 * 根据路径获取节点
 	 */
-	private getNodeByPath(path: string): Record<string, any> | null {
+	private getNodeByPath(path: string): CategoryTreeNode | null {
 		const parts = path.split('/');
-		let current: Record<string, any> = this.tree;
+		let current: CategoryTreeNode = this.tree;
 
 		for (const part of parts) {
-			if (!current[part]) {
+			const child = current[part];
+			if (!child || typeof child !== 'object') {
 				return null;
 			}
-			current = current[part];
+			current = child;
 		}
 
 		return current;
@@ -267,7 +268,7 @@ export class CategoryTreeView {
 	/**
 	 * 更新树数据（外部调用）
 	 */
-	updateTree(newTree: Record<string, any>): void {
+	updateTree(newTree: CategoryTreeNode): void {
 		this.tree = JSON.parse(JSON.stringify(newTree));
 		this.render();
 	}
@@ -328,11 +329,9 @@ class InputModal extends Modal {
 
 		const input = contentEl.createEl('input', {
 			type: 'text',
-			value: this.defaultValue
+			value: this.defaultValue,
+			cls: 'modal-input'
 		});
-
-		input.style.width = '100%';
-		input.style.marginBottom = '20px';
 
 		// 监听回车键
 		input.addEventListener('keydown', (e) => {
@@ -343,15 +342,12 @@ class InputModal extends Modal {
 		});
 
 		const buttonsEl = contentEl.createDiv('modal-button-container');
-		buttonsEl.style.display = 'flex';
-		buttonsEl.style.justifyContent = 'flex-end';
-		buttonsEl.style.gap = '8px';
 
-		const cancelBtn = buttonsEl.createEl('button', { text: '取消' });
+		const cancelBtn = buttonsEl.createEl('button', { text: 'Cancel' });
 		cancelBtn.addEventListener('click', () => this.close());
 
 		const confirmBtn = buttonsEl.createEl('button', {
-			text: '确定',
+			text: 'Confirm',
 			cls: 'mod-cta'
 		});
 		confirmBtn.addEventListener('click', () => {
@@ -391,15 +387,12 @@ class ConfirmModal extends Modal {
 		contentEl.createEl('p', { text: this.message });
 
 		const buttonsEl = contentEl.createDiv('modal-button-container');
-		buttonsEl.style.display = 'flex';
-		buttonsEl.style.justifyContent = 'flex-end';
-		buttonsEl.style.gap = '8px';
 
-		const cancelBtn = buttonsEl.createEl('button', { text: '取消' });
+		const cancelBtn = buttonsEl.createEl('button', { text: 'Cancel' });
 		cancelBtn.addEventListener('click', () => this.close());
 
 		const confirmBtn = buttonsEl.createEl('button', {
-			text: '确定',
+			text: 'Confirm',
 			cls: 'mod-cta'
 		});
 		confirmBtn.addEventListener('click', () => {

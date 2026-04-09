@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { CategoryTreeView } from './CategoryTreeView';
+import { CategoryTreeView, CategoryTreeNode } from './CategoryTreeView';
 
 // Mock i18n
 vi.mock('./i18n', () => ({
@@ -19,8 +19,13 @@ vi.mock('./i18n', () => ({
 /**
  * 创建模拟的 Obsidian HTMLElement
  */
-function createMockElement(tagName: string = 'div'): any {
-	const element = document.createElement(tagName);
+function createMockElement(tagName: string = 'div'): HTMLElement & {
+	empty: () => void;
+	createDiv: (className?: string) => ReturnType<typeof createMockElement>;
+	createEl: (tagName: string, options?: { cls?: string; text?: string }) => ReturnType<typeof createMockElement>;
+	addClass: (className: string) => void;
+} {
+	const element = document.createElement(tagName) as ReturnType<typeof createMockElement>;
 	
 	// 模拟 Obsidian 扩展的 API
 	element.empty = () => {
@@ -34,7 +39,7 @@ function createMockElement(tagName: string = 'div'): any {
 		return div;
 	};
 	
-	element.createEl = (tagName: string, options?: any) => {
+	element.createEl = (tagName: string, options?: { cls?: string; text?: string }) => {
 		const el = createMockElement(tagName);
 		if (options?.cls) el.addClass(options.cls);
 		if (options?.text) el.textContent = options.text;
@@ -50,9 +55,9 @@ function createMockElement(tagName: string = 'div'): any {
 }
 
 describe('CategoryTreeView', () => {
-	let containerEl: any;
+	let containerEl: ReturnType<typeof createMockElement>;
 	let mockOnChange: ReturnType<typeof vi.fn>;
-	let sampleTree: Record<string, any>;
+	let sampleTree: CategoryTreeNode;
 
 	beforeEach(() => {
 		// 创建模拟的 DOM 容器

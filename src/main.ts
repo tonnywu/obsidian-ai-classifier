@@ -237,7 +237,7 @@ export default class AIClassifierPlugin extends Plugin {
 		const result: string[] = [];
 		for (const [key, value] of Object.entries(tree)) {
 			const path = prefix ? `${prefix}/${key}` : key;
-			if (typeof value === 'object' && value !== null && value !== true) {
+			if (typeof value === 'object' && value !== null) {
 				result.push(...this.flattenCategories(value as Record<string, unknown>, path));
 			} else {
 				result.push(path);

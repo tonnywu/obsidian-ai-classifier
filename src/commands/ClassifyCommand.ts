@@ -238,18 +238,18 @@ class ConfirmModal extends Modal {
 		const buttonContainer = contentEl.createDiv('button-container');
 		
 		const confirmBtn = buttonContainer.createEl('button', {
-			text: '确认',
+			text: 'Confirm',
 			cls: 'mod-cta',
 		});
-		confirmBtn.onClick(() => {
+		confirmBtn.addEventListener('click', () => {
 			this.onConfirm(true);
 			this.close();
 		});
 		
 		const cancelBtn = buttonContainer.createEl('button', {
-			text: '取消',
+			text: 'Cancel',
 		});
-		cancelBtn.onClick(() => {
+		cancelBtn.addEventListener('click', () => {
 			this.onConfirm(false);
 			this.close();
 		});

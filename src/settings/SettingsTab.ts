@@ -1,8 +1,8 @@
-import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice, Modal } from 'obsidian';
 import type AIClassifierPlugin from '../main';
-import { AIProviderType, DEFAULT_SETTINGS } from './types';
+import { AIProviderType, DEFAULT_SETTINGS, CategoryTree } from './types';
 import { t } from './i18n';
-import { CategoryTreeView } from './CategoryTreeView';
+import { CategoryTreeView, CategoryTreeNode } from './CategoryTreeView';
 
 // 各服务商可用模型列表
 const AVAILABLE_MODELS: Record<string, Array<{ value: string; label: string }>> = {
@@ -42,18 +42,20 @@ export class SettingsTab extends PluginSettingTab {
 		
 		// 顶部导航栏
 		const headerEl = containerEl.createDiv('settings-header');
-		headerEl.style.cssText = 'display: flex; align-items: center; gap: 12px; margin-bottom: 20px;';
 		
 		// 返回按钮
 		const backBtn = headerEl.createEl('button', {
-			cls: 'clickable-icon',
+			cls: 'settings-back-btn clickable-icon',
 			attr: {
-				'aria-label': '返回上一级',
-				'title': '返回上一级'
+				'aria-label': 'Back to previous level',
+				'title': 'Back to previous level'
 			}
 		});
-		backBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
-		backBtn.style.cssText = 'background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);';
+		
+		// 创建 SVG 图标（使用 innerHTML 因为我们需要完整的 SVG 标签）
+		// eslint-disable-next-line @typescript-eslint/no-unsanitized-method
+		(backBtn as HTMLElement).innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+		
 		backBtn.addEventListener('click', () => {
 			// 直接触发 Obsidian 自带的返回功能
 			// 查找设置侧边栏中的第一个插件选项并点击
@@ -68,16 +70,11 @@ export class SettingsTab extends PluginSettingTab {
 				}
 			}
 		});
-		backBtn.addEventListener('mouseover', () => {
-			backBtn.style.color = 'var(--text-normal)';
-		});
-		backBtn.addEventListener('mouseout', () => {
-			backBtn.style.color = 'var(--text-muted)';
-		});
 		
 		// 标题
-		const titleEl = headerEl.createEl('h2', { text: t('settings.title') });
-		titleEl.style.cssText = 'margin: 0; flex: 1;';
+		new Setting(headerEl)
+			.setName(t('settings.title'))
+			.setHeading();
 		
 		this.addAIProviderSection();
 		this.addCategorySection();
@@ -87,7 +84,9 @@ export class SettingsTab extends PluginSettingTab {
 	
 	private addAIProviderSection(): void {
 		const { containerEl } = this;
-		containerEl.createEl('h3', { text: 'AI 配置' });
+		new Setting(containerEl)
+			.setName('AI Configuration')
+			.setHeading();
 		
 		// AI 提供商选择
 		new Setting(containerEl)
@@ -95,15 +94,15 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.aiProviderDesc'))
 			.addDropdown(dropdown => {
 				dropdown
-					.addOption('ollama', 'Ollama (本地)')
+					.addOption('ollama', 'Ollama (Local)')
 					.addOption('openai', 'OpenAI')
 					.addOption('deepseek', 'DeepSeek')
 					.addOption('moonshot', 'Moonshot (Kimi)')
-					.addOption('zhipu', 'Zhipu (智谱 AI)')
+					.addOption('zhipu', 'Zhipu AI')
 					.setValue(this.plugin.settings.aiProvider)
 					.onChange((value) => {
 						this.plugin.settings.aiProvider = value as AIProviderType;
-						this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 						this.display();
 					});
 			});
@@ -114,22 +113,22 @@ export class SettingsTab extends PluginSettingTab {
 				.setName(t('settings.ollamaUrl'))
 				.setDesc(t('settings.ollamaUrlDesc'))
 				.addText(text => {
-					text.setValue(this.plugin.settings.ollamaUrl)
-						.onChange((value) => {
-							this.plugin.settings.ollamaUrl = value;
-							this.plugin.saveSettings();
-						});
+				text.setValue(this.plugin.settings.ollamaUrl)
+					.onChange((value) => {
+						this.plugin.settings.ollamaUrl = value;
+						void this.plugin.saveSettings();
+					});
 				});
 			
 			new Setting(containerEl)
 				.setName(t('settings.ollamaModel'))
 				.setDesc(t('settings.ollamaModelDesc'))
 				.addText(text => {
-					text.setValue(this.plugin.settings.ollamaModel)
-						.onChange((value) => {
-							this.plugin.settings.ollamaModel = value;
-							this.plugin.saveSettings();
-						});
+				text.setValue(this.plugin.settings.ollamaModel)
+					.onChange((value) => {
+						this.plugin.settings.ollamaModel = value;
+						void this.plugin.saveSettings();
+					});
 				});
 		} else {
 			// API Key 配置
@@ -137,12 +136,12 @@ export class SettingsTab extends PluginSettingTab {
 				.setName(`${this.getProviderDisplayName(this.plugin.settings.aiProvider)} API Key`)
 				.setDesc(`请输入 ${this.getProviderDisplayName(this.plugin.settings.aiProvider)} 的 API Key`)
 				.addText(text => {
-					text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'apiKey'))
-						.setPlaceholder('sk-...')
-						.onChange((value) => {
-							this.updateProviderConfig(this.plugin.settings.aiProvider, 'apiKey', value);
-							this.plugin.saveSettings();
-						});
+				text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'apiKey'))
+					.setPlaceholder('sk-...')
+					.onChange((value) => {
+						this.updateProviderConfig(this.plugin.settings.aiProvider, 'apiKey', value);
+						void this.plugin.saveSettings();
+					});
 					text.inputEl.type = 'password';
 				});
 			
@@ -155,11 +154,11 @@ export class SettingsTab extends PluginSettingTab {
 					models.forEach(model => {
 						dropdown.addOption(model.value, model.label);
 					});
-					dropdown.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'model'))
-						.onChange((value) => {
-							this.updateProviderConfig(this.plugin.settings.aiProvider, 'model', value);
-							this.plugin.saveSettings();
-						});
+				dropdown.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'model'))
+					.onChange((value) => {
+						this.updateProviderConfig(this.plugin.settings.aiProvider, 'model', value);
+						void this.plugin.saveSettings();
+					});
 				});
 			
 			// API URL 配置（高级选项）
@@ -167,12 +166,12 @@ export class SettingsTab extends PluginSettingTab {
 				.setName(`${this.getProviderDisplayName(this.plugin.settings.aiProvider)} API 地址`)
 				.setDesc('自定义 API 端点地址（可选，留空使用官方地址）')
 				.addText(text => {
-					text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'baseUrl'))
-						.setPlaceholder('https://api.example.com/v1')
-						.onChange((value) => {
-							this.updateProviderConfig(this.plugin.settings.aiProvider, 'baseUrl', value);
-							this.plugin.saveSettings();
-						});
+				text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'baseUrl'))
+					.setPlaceholder('https://api.example.com/v1')
+					.onChange((value) => {
+						this.updateProviderConfig(this.plugin.settings.aiProvider, 'baseUrl', value);
+						void this.plugin.saveSettings();
+					});
 				});
 		}
 		
@@ -201,42 +200,46 @@ export class SettingsTab extends PluginSettingTab {
 	
 	private addCategorySection(): void {
 		const { containerEl } = this;
-		containerEl.createEl('h3', { text: '分类配置' });
+		new Setting(containerEl)
+			.setName('Category configuration')
+			.setHeading();
 		
 		new Setting(containerEl)
 			.setName(t('settings.inboxFolder'))
 			.setDesc(t('settings.inboxFolderDesc'))
 			.addText(text => {
-				text.setValue(this.plugin.settings.inboxFolder)
-					.onChange((value) => {
-						this.plugin.settings.inboxFolder = value;
-						this.plugin.saveSettings();
-					});
+			text.setValue(this.plugin.settings.inboxFolder)
+				.onChange((value) => {
+					this.plugin.settings.inboxFolder = value;
+					void this.plugin.saveSettings();
+				});
 			});
 		
 		new Setting(containerEl)
-			.setName('扫描子文件夹')
-			.setDesc('是否递归扫描收件箱子目录中的文件。关闭则只分类收件箱顶层的文件。')
+			.setName('Scan subfolders')
+			.setDesc('Whether to recursively scan files in inbox subdirectories. Disable to only classify files at the top level of inbox.')
 			.addToggle(toggle => {
-				toggle.setValue(this.plugin.settings.scanSubfolders)
-					.onChange((value) => {
-						this.plugin.settings.scanSubfolders = value;
-						this.plugin.saveSettings();
-					});
+			toggle.setValue(this.plugin.settings.scanSubfolders)
+				.onChange((value) => {
+					this.plugin.settings.scanSubfolders = value;
+					void this.plugin.saveSettings();
+				});
 			});
 		
 		// 可视化分类树
-		containerEl.createEl('h4', { text: t('settings.categoryTree') });
+		new Setting(containerEl)
+			.setName(t('settings.categoryTree'))
+			.setHeading();
 		
 		const treeContainer = containerEl.createDiv('category-tree-wrapper');
 		
 		new CategoryTreeView(
 			treeContainer,
-			this.plugin.settings.categoryTree,
+			this.plugin.settings.categoryTree as CategoryTreeNode,
 			(newTree) => {
-				this.plugin.settings.categoryTree = newTree;
+				this.plugin.settings.categoryTree = newTree as CategoryTree;
 				this.plugin.settings.categories = this.flattenCategories(newTree);
-				this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 			}
 		);
 		
@@ -246,69 +249,81 @@ export class SettingsTab extends PluginSettingTab {
 			.addButton(btn => {
 				btn.setButtonText(t('settings.restoreDefault'))
 					.onClick(() => {
-						if (confirm(t('settings.confirmRestoreDefault'))) {
-							this.plugin.settings.categoryTree = DEFAULT_SETTINGS.categoryTree;
-							this.plugin.settings.categories = this.flattenCategories(DEFAULT_SETTINGS.categoryTree);
-							void this.plugin.saveSettings();
-							this.display(); // 刷新设置面板
-						}
+						this.showRestoreConfirm();
 					});
 			});
 	}
 	
+	private showRestoreConfirm(): void {
+		const modal = new RestoreConfirmModal(
+			this.app,
+			() => {
+				this.plugin.settings.categoryTree = DEFAULT_SETTINGS.categoryTree;
+				this.plugin.settings.categories = this.flattenCategories(DEFAULT_SETTINGS.categoryTree);
+				void this.plugin.saveSettings();
+				this.display(); // 刷新设置面板
+			}
+		);
+		modal.open();
+	}
+	
 	private addAdvancedSection(): void {
 		const { containerEl } = this;
-		containerEl.createEl('h3', { text: '高级设置' });
+		new Setting(containerEl)
+			.setName('Advanced settings')
+			.setHeading();
 		
 		new Setting(containerEl)
 			.setName(t('settings.enableSuggestedCategories'))
 			.setDesc(t('settings.enableSuggestedCategoriesDesc'))
 			.addToggle(toggle => {
-				toggle.setValue(this.plugin.settings.enableSuggestedCategories)
-					.onChange((value) => {
-						this.plugin.settings.enableSuggestedCategories = value;
-						this.plugin.saveSettings();
-					});
+			toggle.setValue(this.plugin.settings.enableSuggestedCategories)
+				.onChange((value) => {
+					this.plugin.settings.enableSuggestedCategories = value;
+					void this.plugin.saveSettings();
+				});
 			});
 		
 		new Setting(containerEl)
 			.setName(t('settings.autoMoveFile'))
 			.setDesc(t('settings.autoMoveFileDesc'))
 			.addToggle(toggle => {
-				toggle.setValue(this.plugin.settings.autoMoveFile)
-					.onChange((value) => {
-						this.plugin.settings.autoMoveFile = value;
-						this.plugin.saveSettings();
-					});
+			toggle.setValue(this.plugin.settings.autoMoveFile)
+				.onChange((value) => {
+					this.plugin.settings.autoMoveFile = value;
+					void this.plugin.saveSettings();
+				});
 			});
 		
 		new Setting(containerEl)
 			.setName(t('settings.confidenceThreshold'))
 			.setDesc(t('settings.confidenceThresholdDesc'))
 			.addSlider(slider => {
-				slider.setValue(this.plugin.settings.confidenceThreshold * 100)
-					.setLimits(0, 100, 1)
-					.setDynamicTooltip()
-					.onChange((value) => {
-						this.plugin.settings.confidenceThreshold = value / 100;
-						this.plugin.saveSettings();
-					});
+			slider.setValue(this.plugin.settings.confidenceThreshold * 100)
+				.setLimits(0, 100, 1)
+				.setDynamicTooltip()
+				.onChange((value) => {
+					this.plugin.settings.confidenceThreshold = value / 100;
+					void this.plugin.saveSettings();
+				});
 			});
 	}
 	
 	private addDebugSection(): void {
 		const { containerEl } = this;
-		containerEl.createEl('h3', { text: '调试' });
+		new Setting(containerEl)
+			.setName('Debug')
+			.setHeading();
 		
 		new Setting(containerEl)
 			.setName(t('settings.enableDebugLog'))
 			.setDesc(t('settings.enableDebugLogDesc'))
 			.addToggle(toggle => {
-				toggle.setValue(this.plugin.settings.enableDebugLog)
-					.onChange((value) => {
-						this.plugin.settings.enableDebugLog = value;
-						this.plugin.saveSettings();
-					});
+			toggle.setValue(this.plugin.settings.enableDebugLog)
+				.onChange((value) => {
+					this.plugin.settings.enableDebugLog = value;
+					void this.plugin.saveSettings();
+				});
 			});
 	}
 	
@@ -424,5 +439,45 @@ export class SettingsTab extends PluginSettingTab {
 				else if (key === 'baseUrl') this.plugin.settings.zhipuApiUrl = value;
 				break;
 		}
+	}
+}
+
+/**
+ * Restore confirmation modal
+ */
+class RestoreConfirmModal extends Modal {
+	private onConfirm: () => void;
+
+	constructor(app: App, onConfirm: () => void) {
+		super(app);
+		this.onConfirm = onConfirm;
+	}
+
+	onOpen(): void {
+		const { contentEl } = this;
+		contentEl.createEl('p', { text: t('settings.confirmRestoreDefault') });
+
+		const buttonContainer = contentEl.createDiv('modal-button-container');
+
+		const confirmBtn = buttonContainer.createEl('button', {
+			text: 'Confirm',
+			cls: 'mod-cta',
+		});
+		confirmBtn.addEventListener('click', () => {
+			this.onConfirm();
+			this.close();
+		});
+
+		const cancelBtn = buttonContainer.createEl('button', {
+			text: 'Cancel',
+		});
+		cancelBtn.addEventListener('click', () => {
+			this.close();
+		});
+	}
+
+	onClose(): void {
+		const { contentEl } = this;
+		contentEl.empty();
 	}
 }
