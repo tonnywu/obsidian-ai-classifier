@@ -16,7 +16,7 @@ export interface CategoryNode {
  * 分类树节点类型
  */
 export interface CategoryTreeNode {
-	[key: string]: CategoryTreeNode | true | boolean;
+	[key: string]: CategoryTreeNode | boolean;
 }
 
 /**

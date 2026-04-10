@@ -52,9 +52,21 @@ export class SettingsTab extends PluginSettingTab {
 			}
 		});
 		
-		// 创建 SVG 图标（使用 innerHTML 因为我们需要完整的 SVG 标签）
-		// eslint-disable-next-line @typescript-eslint/no-unsanitized-method
-		(backBtn as HTMLElement).innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+		// 创建 SVG 图标
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		svg.setAttribute('width', '24');
+		svg.setAttribute('height', '24');
+		svg.setAttribute('viewBox', '0 0 24 24');
+		svg.setAttribute('fill', 'none');
+		svg.setAttribute('stroke', 'currentColor');
+		svg.setAttribute('stroke-width', '2');
+		svg.setAttribute('stroke-linecap', 'round');
+		svg.setAttribute('stroke-linejoin', 'round');
+		
+		const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		path.setAttribute('d', 'm15 18-6-6 6-6');
+		svg.appendChild(path);
+		backBtn.appendChild(svg);
 		
 		backBtn.addEventListener('click', () => {
 			// 直接触发 Obsidian 自带的返回功能
@@ -85,7 +97,7 @@ export class SettingsTab extends PluginSettingTab {
 	private addAIProviderSection(): void {
 		const { containerEl } = this;
 		new Setting(containerEl)
-			.setName('AI Configuration')
+			.setName('AI configuration')
 			.setHeading();
 		
 		// AI 提供商选择
@@ -270,7 +282,7 @@ export class SettingsTab extends PluginSettingTab {
 	private addAdvancedSection(): void {
 		const { containerEl } = this;
 		new Setting(containerEl)
-			.setName('Advanced settings')
+			.setName('Advanced')
 			.setHeading();
 		
 		new Setting(containerEl)

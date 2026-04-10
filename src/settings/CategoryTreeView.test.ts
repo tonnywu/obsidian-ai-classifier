@@ -29,7 +29,9 @@ function createMockElement(tagName: string = 'div'): HTMLElement & {
 	
 	// 模拟 Obsidian 扩展的 API
 	element.empty = () => {
-		element.innerHTML = '';
+		while (element.firstChild) {
+			element.removeChild(element.firstChild);
+		}
 	};
 	
 	element.createDiv = (className?: string) => {
