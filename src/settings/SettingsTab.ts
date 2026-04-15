@@ -107,9 +107,9 @@ export class SettingsTab extends PluginSettingTab {
 			.addDropdown(dropdown => {
 				dropdown
 					.addOption('ollama', 'Ollama (local)')
-					.addOption('openai', 'OpenAI')
-					.addOption('deepseek', 'DeepSeek')
-					.addOption('moonshot', 'Moonshot (Kimi)')
+					.addOption('openai', 'OpenAi')
+					.addOption('deepseek', 'Deepseek')
+					.addOption('moonshot', 'Moonshot (kimi)')
 					.addOption('zhipu', 'Zhipu AI')
 					.setValue(this.plugin.settings.aiProvider)
 					.onChange((value) => {
@@ -149,7 +149,7 @@ export class SettingsTab extends PluginSettingTab {
 				.setDesc(`请输入 ${this.getProviderDisplayName(this.plugin.settings.aiProvider)} 的 API Key`)
 				.addText(text => {
 				text.setValue(this.getProviderValue(this.plugin.settings.aiProvider, 'apiKey'))
-					.setPlaceholder('sk-...')
+					.setPlaceholder('API key...')
 					.onChange((value) => {
 						this.updateProviderConfig(this.plugin.settings.aiProvider, 'apiKey', value);
 						void this.plugin.saveSettings();
