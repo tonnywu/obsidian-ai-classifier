@@ -7,12 +7,12 @@ import { describe, it, expect } from 'vitest';
  */
 describe('flattenCategories', () => {
 	// 从源码复制的 flattenCategories 逻辑
-	const flattenCategories = (tree: Record<string, any>, prefix = ''): string[] => {
+	const flattenCategories = (tree: Record<string, unknown>, prefix = ''): string[] => {
 		const result: string[] = [];
 		for (const [key, value] of Object.entries(tree)) {
 			const path = prefix ? `${prefix}/${key}` : key;
-			if (typeof value === 'object' && value !== true) {
-				result.push(...flattenCategories(value, path));
+			if (typeof value === 'object' && value !== null) {
+				result.push(...flattenCategories(value as Record<string, unknown>, path));
 			} else {
 				result.push(path);
 			}

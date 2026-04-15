@@ -106,7 +106,7 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(t('settings.aiProviderDesc'))
 			.addDropdown(dropdown => {
 				dropdown
-					.addOption('ollama', 'Ollama (Local)')
+					.addOption('ollama', 'Ollama (local)')
 					.addOption('openai', 'OpenAI')
 					.addOption('deepseek', 'DeepSeek')
 					.addOption('moonshot', 'Moonshot (Kimi)')

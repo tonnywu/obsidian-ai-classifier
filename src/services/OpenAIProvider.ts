@@ -93,7 +93,10 @@ export class OpenAICompatibleProvider implements AIProvider {
 					const errorMsg = error.error?.message || `HTTP ${response.status}`;
 					
 					// 构造更详细的错误
-					const enhancedError = new Error(errorMsg) as any;
+					const enhancedError = new Error(errorMsg) as Error & {
+						status: number;
+						response: { status: number; headers: Headers };
+					};
 					enhancedError.status = response.status;
 					enhancedError.response = { 
 						status: response.status,
