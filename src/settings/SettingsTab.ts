@@ -107,7 +107,7 @@ export class SettingsTab extends PluginSettingTab {
 			.addDropdown(dropdown => {
 				dropdown
 					.addOption('ollama', 'Ollama (local)')
-					.addOption('openai', 'OpenAi')
+					.addOption('openai', 'Openai')
 					.addOption('deepseek', 'Deepseek')
 					.addOption('moonshot', 'Moonshot (kimi)')
 					.addOption('zhipu', 'Zhipu AI')
